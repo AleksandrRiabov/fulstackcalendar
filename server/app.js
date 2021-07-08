@@ -1,41 +1,36 @@
+if (process.env.NODE_ENV !== "production") {
+	require("dotenv").config();
+}
+const dbPassword = process.env.Mongo_Atlas_Password;
+const mongoLogin = process.env.Mongo_login;
+
 const express = require("express");
 const app = express();
 const cors = require('cors');
-const moment = require("moment");
+const mongoose = require("mongoose");
 
-app.get("/", cors(), (req, res) => {
-     res.json({hello: "Hi from the back end bro !"})
+const calendarRoutes = require("./routes/calendar");
+const adminRoutes = require("./routes/admin");
+
+
+app.use(express.json({extended: true})); 
+
+mongoose.connect("mongodb+srv://"+ mongoLogin +":" + dbPassword+ "@calendar.uwuzq.mongodb.net/<dbname>?retryWrites=true&w=majority", {
+	useNewUrlParser: true,
+	useCreateIndex: true,
+	useUnifiedTopology: true,
+	useFindAndModify: false
+}).then(() => {
+	console.log(" BE CAREFULL: Connected to PRODACTION DB")
+}).catch(err => {
+	console.log("Something whent wrong!")
+    console.log(err.message)
 });
 
+//Routes
+app.use("/", cors(),calendarRoutes);
+app.use("/", cors(),adminRoutes);
 
-
-app.get("/getmonth/:startdate", cors(), (req, res) => {
-   const startdate = req.params.startdate;
-	console.log(startdate)
-	const generateCalendar = (startingDate) => {
-    const value = startingDate;
-    const startDay = value.clone().startOf("month").startOf("week");
-	const endDay = value.clone().endOf("month").startOf("week");
-	const day = startDay.clone().subtract(1, "day");
-	
-
-	const calendar = {};
-	
-	while(day.isBefore(endDay, day)){
-		 Array(7)
-			.fill(0)
-			.map(() => {
-				return calendar[day.add(1, "day").clone().format("MM DD YYYY").toString()] = {workDay: true,
-               times: [{time: "12:00", available: false}, {time: "15:00", available: true}, {time: "19:30", available: true}, {time: "19:00", available: false}]
-               }
-			})
-	}
-	return calendar;
-}
-	const data = generateCalendar(moment());
-	
-	res.json(data)
-});
 
 
 app.listen("3001", () => console.log("BAck end started"));

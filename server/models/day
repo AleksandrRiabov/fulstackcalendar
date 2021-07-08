@@ -1,0 +1,29 @@
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
+const Appointment = require("./appointment");
+
+let daySchema = new mongoose.Schema({ 
+		day: "",
+      appointments: [{type: Schema.Types.ObjectId, ref: "Appointment"}],
+      workDay: {
+         type: Boolean,
+         default: true
+      },
+      workingHours: {
+         type: {},
+         default: {
+            "08:00": true,
+            "09:00": true,
+            "10:00": true,
+             "11:00": true,
+            "12:00": true,
+            "13:00": true,
+             "14:00": true,
+            "15:00": true,
+            "16:00": true
+         }
+      },
+});
+
+
+module.exports = mongoose.model("Day", daySchema);
