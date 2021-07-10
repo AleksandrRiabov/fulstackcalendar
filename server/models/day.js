@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const Appointment = require("./appointment");
 
-let daySchema = new mongoose.Schema({ 
+const daySchema = new mongoose.Schema({ 
 		day: "",
       appointments: [{type: Schema.Types.ObjectId, ref: "Appointment"}],
       workDay: {
@@ -25,5 +25,17 @@ let daySchema = new mongoose.Schema({
       },
 });
 
+
+//TO DELETE ALL REVIEWS WIDTH REMOVED CAMPGROUND/  This is mongo middleware which runs before "findOneAndDelete"
+
+daySchema.post("findOneAndDelete", async function(doc) {
+	if (doc){
+		await Appointment.deleteMany({
+			_id:{
+				$in: doc.appointments
+			}
+		});
+	}
+});
 
 module.exports = mongoose.model("Day", daySchema);

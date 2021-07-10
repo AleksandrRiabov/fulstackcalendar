@@ -10,7 +10,7 @@ const Day = require("../models/day");
 
 //=======================GET / BUILD CALENDAR
 router.get("/getmonth/:startdate",  async(req, res) => {
-   const startdate = req.params.startdate;
+   const startdate = new Date(req.params.startdate);
 	const query = getArrayFromRequestedDays(moment(startdate)); // Build Array from requested month dates, to use in mongo search.
 	const dates = await Day.find({day: query}).populate("appointments");
 	const data = generateResponse(dates);
